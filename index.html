@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For You | My Love</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Playfair+Display:ital,wght@0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #faf4ed;
+      --accent-rose: #b54a54;
+      --accent-deep: #70262e;
+      --paper: #fffdfa;
+      --shadow-soft: 0 10px 30px rgba(110, 46, 52, 0.08);
+      --shadow-lifted: 0 18px 45px rgba(110, 46, 52, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      font-family: 'Poppins', sans-serif;
+      color: #4a3e3d;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Floating Canvas */
+    #ambient-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Audio Toggle */
+    .audio-btn {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 99;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(181, 74, 84, 0.2);
+      border-radius: 30px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--accent-rose);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: all 0.25s ease;
+    }
+
+    .audio-btn:hover {
+      transform: scale(1.05);
+      background: #ffffff;
+    }
+
+    /* Screens Base */
+    .screen {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s ease, visibility 0.5s;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(12px) scale(0.98);
+      z-index: 1;
+    }
+
+    .screen.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+      z-index: 2;
+    }
+
+    /* Screen 1: The Interactive Present */
+    .gift-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      animation: floatIdle 3s ease-in-out infinite;
+    }
+
+    .gift-box {
+      width: 130px;
+      height: 130px;
+      position: relative;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .gift-stage:hover .gift-box {
+      transform: scale(1.08) rotate(-2deg);
+    }
+
+    @keyframes floatIdle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .script-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 6vw, 2.4rem);
+      font-weight: 600;
+      font-style: italic;
+      color: var(--accent-rose);
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .tap-hint {
+      font-family: 'Caveat', cursive;
+      font-size: 1.3rem;
+      color: #9d877e;
+      margin-top: 6px;
+    }
+
+    /* Screen 2: Envelope Card */
+    .envelope-card {
+      background: var(--paper);
+      padding: 30px 24px;
+      border-radius: 28px;
+      box-shadow: var(--shadow-soft);
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
+      border: 1px solid #f2e4d8;
+      position: relative;
+    }
+
+    .avatar-wrap {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 16px auto;
+    }
+
+    .avatar-wrap img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #fff;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+    .quote-box {
+      background: #fdf5f2;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      border-left: 3px solid var(--accent-rose);
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .quote-box strong {
+      color: var(--accent-rose);
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, var(--accent-rose), var(--accent-deep));
+      color: white;
+      border: none;
+      border-radius: 24px;
+      padding: 12px 28px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(181, 74, 84, 0.3);
+      transition: all 0.25s ease;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(181, 74, 84, 0.4);
+    }
+
+    /* Screen 3: Passkey Pad */
+    .keypad-container {
+      background: var(--paper);
+      padding: 28px 24px;
+      border-radius: 30px;
+      box-shadow: var(--shadow-lifted);
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+      border: 1px solid #f3e5d8;
+    }
+
+    .pin-hint {
+      font-family: 'Caveat', cursive;
+      font-size: 1.2rem;
+      color: #9c897f;
+      margin-top: 4px;
+    }
+
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 22px 0 26px;
+    }
+
+    .dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #d2c0b0;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .dot.filled {
+      background: var(--accent-rose);
+      border-color: var(--accent-rose);
+      transform: scale(1.2);
+    }
+
+    .pin-dots.shake {
+      animation: shake 0.35s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .key-btn {
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: #ffffff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: #4b3d37;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .key-btn:active {
+      transform: scale(0.9);
+      background: #f7ede3;
+    }
+
+    .key-btn.action {
+      font-size: 0.85rem;
+      background: transparent;
+      box-shadow: none;
+      color: #927a6f;
+    }
+
+    /* Screen 4: Dynamic Scrollable Scrapbook */
+    #screen-gallery {
+      position: relative;
+      min-height: 100dvh;
+      height: auto;
+      overflow-y: auto;
+      justify-content: flex-start;
+      padding: 50px 16px 90px;
+      display: none;
+    }
+
+    #screen-gallery.active {
+      display: flex;
+    }
+
+    .scrapbook {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      margin: 0 auto;
+    }
+
+    .polaroid-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      width: 100%;
+    }
+
+    .polaroid {
+      background: #ffffff;
+      padding: 10px 10px 26px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .polaroid img {
+      width: 100%;
+      aspect-ratio: 1/1;
+      object-fit: cover;
+      display: block;
+      border-radius: 2px;
+    }
+
+    .polaroid-caption {
+      font-family: 'Caveat', cursive;
+      font-size: 1.1rem;
+      text-align: center;
+      margin-top: 10px;
+      color: #634f45;
+    }
+
+    .polaroid:nth-child(odd) { transform: rotate(-2.5deg); }
+    .polaroid:nth-child(even) { transform: rotate(2.5deg); }
+
+    .polaroid:hover, .polaroid.highlighted {
+      transform: scale(1.08) rotate(0deg) !important;
+      box-shadow: var(--shadow-lifted);
+      z-index: 10;
+    }
+
+    .letter-paper {
+      background: #fffdf7;
+      width: 100%;
+      border-radius: 20px;
+      padding: 30px 24px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid #ebd8c5;
+      line-height: 1.85;
+      font-size: clamp(1.1rem, 3.8vw, 1.25rem);
+      font-family: 'Caveat', cursive;
+      color: #3b302a;
+      position: relative;
+    }
+
+    .letter-paper::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(transparent, transparent 31px, #eedec9 32px);
+      pointer-events: none;
+      opacity: 0.35;
+      border-radius: 20px;
+    }
+
+    .letter-content {
+      position: relative;
+      z-index: 1;
+      white-space: pre-line;
+      user-select: text;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Floating Heart Particles -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- Sound Toggle -->
+  <button class="audio-btn" onclick="toggleAudio()">
+    <span id="audio-icon">♪</span>
+    <span id="audio-text">Play Music</span>
+  </button>
+
+  <audio id="bg-audio" loop preload="auto" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112199.mp3"></audio>
+
+  <!-- SCREEN 1 -->
+  <div id="screen-gift" class="screen active">
+    <div class="gift-stage" onclick="openGift()">
+      <svg class="gift-box" viewBox="0 0 120 120">
+        <rect x="25" y="45" width="70" height="55" rx="8" fill="#fad7dc" stroke="#b54a54" stroke-width="3"/>
+        <rect x="20" y="35" width="80" height="15" rx="6" fill="#fad7dc" stroke="#b54a54" stroke-width="3"/>
+        <line x1="60" y1="35" x2="60" y2="100" stroke="#b54a54" stroke-width="7"/>
+        <path d="M60,35 C45,12 20,22 45,35 Z" fill="#eb7d8e" stroke="#b54a54" stroke-width="2.5"/>
+        <path d="M60,35 C75,12 100,22 75,35 Z" fill="#eb7d8e" stroke="#b54a54" stroke-width="2.5"/>
+      </svg>
+      <h1 class="script-title">For you, my favorite person.</h1>
+      <p class="tap-hint">(tap the gift box)</p>
+    </div>
+  </div>
+
+  <!-- SCREEN 2 -->
+  <div id="screen-quote" class="screen">
+    <div class="envelope-card">
+      <h2 class="script-title" style="margin-top:0; font-size: 1.8rem;">A quick reminder...</h2>
+      
+      <div class="avatar-wrap">
+        <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=400&q=80" alt="Special Memory" />
+      </div>
+
+      <div class="quote-box">
+        "In your <strong>smile</strong>, I found my calm.<br />
+        In your <strong>arms</strong>, I found my home."
+      </div>
+
+      <button class="primary-btn" onclick="goToScreen('screen-passkey')">
+        <span>Unlock My Note</span>
+        <span>→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3 -->
+  <div id="screen-passkey" class="screen">
+    <div class="keypad-container">
+      <h2 style="font-family: 'Playfair Display', serif; color: var(--accent-rose); font-size: 1.45rem;">Secret Passcode</h2>
+      <p class="pin-hint">Hint: Our favorite digits (Default: 1234)</p>
+      
+      <div class="pin-dots" id="pin-dots-container">
+        <div class="dot" id="dot-0"></div>
+        <div class="dot" id="dot-1"></div>
+        <div class="dot" id="dot-2"></div>
+        <div class="dot" id="dot-3"></div>
+      </div>
+
+      <div class="keypad">
+        <button class="key-btn" onclick="pressKey('1')">1</button>
+        <button class="key-btn" onclick="pressKey('2')">2</button>
+        <button class="key-btn" onclick="pressKey('3')">3</button>
+        <button class="key-btn" onclick="pressKey('4')">4</button>
+        <button class="key-btn" onclick="pressKey('5')">5</button>
+        <button class="key-btn" onclick="pressKey('6')">6</button>
+        <button class="key-btn" onclick="pressKey('7')">7</button>
+        <button class="key-btn" onclick="pressKey('8')">8</button>
+        <button class="key-btn" onclick="pressKey('9')">9</button>
+        <button class="key-btn action" onclick="clearPin()">Clear</button>
+        <button class="key-btn" onclick="pressKey('0')">0</button>
+        <button class="key-btn action" onclick="deletePin()">⌫</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4 -->
+  <div id="screen-gallery" class="screen">
+    <div class="scrapbook">
+      
+      <div class="polaroid-grid">
+        <div class="polaroid" onclick="togglePolaroid(this)">
+          <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=500&q=80" alt="Memory 1">
+          <p class="polaroid-caption">Where it started ✨</p>
+        </div>
+        <div class="polaroid" onclick="togglePolaroid(this)">
+          <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=500&q=80" alt="Memory 2">
+          <p class="polaroid-caption">The sweetest days</p>
+        </div>
+        <div class="polaroid" onclick="togglePolaroid(this)">
+          <img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=500&q=80" alt="Memory 3">
+          <p class="polaroid-caption">Laughing endlessly</p>
+        </div>
+        <div class="polaroid" onclick="togglePolaroid(this)">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" alt="Memory 4">
+          <p class="polaroid-caption">My whole world</p>
+        </div>
+      </div>
+
+      <div class="letter-paper">
+        <div class="letter-content">
+To My Dearest,
+
+I am writing this little note just because you have been on my mind all day long—which is nothing new, since you pretty much live there anyway. 
+
+Every single time I see your smile, my heart does a happy jump. Thank you for all the warm hugs, the inside jokes that only we get, and the calm feeling of knowing you are mine. 
+
+Being by your side is the easiest, best thing in my life. I love you endlessly, through every chapter.
+        </div>
+      </div>
+
+      <div style="text-align: center; margin: 10px 0 20px;">
+        <h3 class="script-title" style="margin-top: 0; font-size: 1.6rem;">Always & Forever</h3>
+        <p style="font-family: 'Caveat', cursive; font-size: 1.2rem; color: #87746c;">Yours, completely.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const CORRECT_PIN = "1234";
+    let currentInput = "";
+    let isVerifying = false;
+
+    // Web Audio synthesizer for tactile taps
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, duration) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    // Audio Playback Controller
+    const audioEl = document.getElementById("bg-audio");
+    const audioText = document.getElementById("audio-text");
+    function toggleAudio() {
+      if (audioEl.paused) {
+        audioEl.play().then(() => {
+          audioText.textContent = "Pause Music";
+        }).catch(() => {});
+      } else {
+        audioEl.pause();
+        audioText.textContent = "Play Music";
+      }
+    }
+
+    function openGift() {
+      playTone(520, 0.15);
+      if (audioEl.paused) {
+        audioEl.play().then(() => audioText.textContent = "Pause Music").catch(() => {});
+      }
+      goToScreen("screen-quote");
+    }
+
+    function goToScreen(screenId) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      const target = document.getElementById(screenId);
+      if (target) {
+        target.classList.add("active");
+        window.scrollTo(0, 0);
+      }
+    }
+
+    function pressKey(num) {
+      if (isVerifying || currentInput.length >= 4) return;
+      playTone(440, 0.08);
+      currentInput += num;
+      updateDots();
+
+      if (currentInput.length === 4) {
+        isVerifying = true;
+        setTimeout(verifyPin, 180);
+      }
+    }
+
+    function deletePin() {
+      if (isVerifying) return;
+      playTone(320, 0.08);
+      currentInput = currentInput.slice(0, -1);
+      updateDots();
+    }
+
+    function clearPin() {
+      playTone(280, 0.08);
+      currentInput = "";
+      updateDots();
+    }
+
+    function updateDots() {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (i < currentInput.length) {
+          dot.classList.add("filled");
+        } else {
+          dot.classList.remove("filled");
+        }
+      }
+    }
+
+    function verifyPin() {
+      if (currentInput === CORRECT_PIN) {
+        playTone(680, 0.2);
+        triggerHeartBurst();
+        setTimeout(() => {
+          goToScreen("screen-gallery");
+        }, 500);
+      } else {
+        playTone(200, 0.25);
+        const dotsContainer = document.getElementById("pin-dots-container");
+        dotsContainer.classList.add("shake");
+        
+        setTimeout(() => {
+          dotsContainer.classList.remove("shake");
+          clearPin();
+          isVerifying = false;
+        }, 400);
+      }
+    }
+
+    function togglePolaroid(el) {
+      document.querySelectorAll('.polaroid').forEach(p => {
+        if (p !== el) p.classList.remove('highlighted');
+      });
+      el.classList.toggle('highlighted');
+    }
+
+    // Ambient floating canvas simulation
+    const canvas = document.getElementById("ambient-canvas");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    class FloatingHeart {
+      constructor(x, y, isBurst = false) {
+        this.x = x || Math.random() * canvas.width;
+        this.y = y || canvas.height + Math.random() * 50;
+        this.size = Math.random() * 12 + 8;
+        this.speedY = isBurst ? (Math.random() - 0.5) * 12 : Math.random() * 0.8 + 0.3;
+        this.speedX = isBurst ? (Math.random() - 0.5) * 12 : Math.sin(this.y) * 0.5;
+        this.opacity = isBurst ? 1 : Math.random() * 0.4 + 0.2;
+        this.fadeRate = isBurst ? 0.015 : 0;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.scale(this.size / 20, this.size / 20);
+        ctx.fillStyle = `rgba(207, 102, 116, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-10, -10, -20, 5, 0, 20);
+        ctx.bezierCurveTo(20, 5, 10, -10, 0, 0);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      update() {
+        this.y -= this.speedY;
+        this.x += this.speedX;
+        if (this.fadeRate > 0) {
+          this.opacity -= this.fadeRate;
+        } else if (this.y < -30) {
+          this.y = canvas.height + 20;
+          this.x = Math.random() * canvas.width;
+        }
+      }
+    }
+
+    // Initialize regular particles
+    for (let i = 0; i < 16; i++) {
+      particles.push(new FloatingHeart(null, Math.random() * window.innerHeight));
+    }
+
+    function triggerHeartBurst() {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      for (let i = 0; i < 35; i++) {
+        particles.push(new FloatingHeart(centerX, centerY, true));
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
+        if (particles[i].opacity <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
